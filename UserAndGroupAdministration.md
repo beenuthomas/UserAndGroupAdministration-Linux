@@ -14,19 +14,46 @@ When a new user is added, the information is stored as a single, colon-separated
 tail -1 /etc/passwd
 test:x:1001:1001:test user:/home/test:/bin/bash
 ```
+| Field  | Description |
+| ------------- | ------------- |
+| test  | Username  |
+| x  | Indicates that shadow passwords are used  |
+| 1001  | UID, these begin with 1000 and increment by 1 for each newly added user. UIDs below 1000 are reserved for system use.  |
+| 1001  | GID of the user’s primary group. These begin with 1000 and increment by 1 for each new group. Users can belong to more than one group.  |
+| test user  | GECOS (General Electric Comprehensive Operating System) information, used only for informational purposes such as full name  |
+| /home/test  | Home directory for this user  |
+| /bin/bash  | Default shell for this user  |
+
 ## /etc/shadow
 With shadow passwords, a new entry is automatically added to /etc/shadow when a new user is created. This file can be viewed only by root. Here is an example of an entry in this file:
 ```
 tail -1 /etc/shadow
 test:$6$XBCDBQ...:17610:0:99999:7:::
 ```
+| Field  | Description |
+| ------------- | ------------- |
+| test  | Username  |
+| $6$XBCDBQ...  | Hashed password value (partial value shown). The plain text password itself is not stored on the disk. An algorithm creates a unique string from a password.  |
+| 17610  | Number of days since password has changed (counted in days since Jan 1, 1970).  |
+| 0  | Number of days that need to pass before the password must be changed by the user.  |
+| 99999  | Maximum number of days since the password changed that the password can be used. After this amount of days, the password must be changed by the user.  |
+| 7  | Number of days before expire date that the user is warned about the pending password change policy. If the password is not changed after this number of days, the user account is locked.  |
+
+The next field is empty but is used to store the last date when the account is locked (counted in days since Jan 1, 1970). The last field is also empty but is not used.
 ## /etc/group
 Because Oracle Linux uses a UPG scheme, a new entry is automatically created in /etc/group when a new user is added. The group name is the same as the username. Here is an example of an entry in this file:
 ```
 tail -1 /etc/group
 test:x:1000:test
 ```
+| Field  | Description |
+| ------------- | ------------- |
+| test  | Username  |
+| x  | Indicates that shadow passwords are used  |
+| 1000  | GID  |
+| test  | List of users that are members of the group  |
 Each group can have multiple users. Users can also belong to multiple groups. The GID stored in the user’s entry in /etc/passwd is the user’s primary group.
+
 ## /etc/gshadow
 Hashed group passwords are stored in this file. However, group passwords are rarely used. Here is an example of an entry in this file:
 ```
