@@ -130,5 +130,11 @@ gpasswd group_name
 ## groups
 The groups command displays the groups that a user belongs to. The following example illustrates that user oracle belongs to two groups, oracle (primary group) and students (secondary group):
 ```
-grep
+groups user_name
 ```
+# Password Configuration
+Password aging requires users to change their passwords periodically. Use the chage command to configure password expiration. The syntax is:
+```
+chage [options] user_name
+```
+Password aging information is stored in the /etc/shadow file.
