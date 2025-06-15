@@ -8,6 +8,7 @@ RedHat Linux uses a **user private group (UPG)** scheme. When a new user account
 Both users and groups use shadow passwords. Passwords are hashed and stored in different files, `/etc/shadow` for users and `/etc/gshadow` for groups. Security improves by storing hashed passwords in “shadow” files, because these files are readable only by the root user. The use of shadow passwords also provides password aging parameters and allows security policies to be enforced, using the /etc/login.defs file. Only the root user can add, modify, or delete user and group accounts.
 
 # User and Group Configuration Files
+
 ## /etc/passwd
 When a new user is added, the information is stored as a single, colon-separated line in /etc/passwd. Here is an example of an entry in this file:
 ```
