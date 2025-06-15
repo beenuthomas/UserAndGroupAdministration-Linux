@@ -138,3 +138,114 @@ Password aging requires users to change their passwords periodically. Use the ch
 chage [options] user_name
 ```
 Password aging information is stored in the /etc/shadow file.
+
+# Task Commands
+1. Create users and Groups
+2. Set Passwords and Apply Password Policies
+3. Sudo Access
+4. Account expiry and lock
+5. Verification
+6. Cleanup
+
+## Create users and Groups
+```
+root@beenu:~# groupadd engineers                                                         #created new group called engineers
+root@beenu:~# useradd -m -s /bin/bash -g engineers -c "Developer one" devuser1           #add user named devuser1 to group engineers,set /bin/bash as default shell and set a comment
+root@beenu:~# mkdir /customhome                                                          #created /customhome directory
+root@beenu:~# useradd -m -d /customhome/devuser2 -s /bin/bash -g engineers devuser2      #add devuser2 to group engineers, with a custom home directory
+root@beenu:~# groups devuser1           
+devuser1 : engineers
+root@beenu:~# groups devuser2
+devuser2 : engineers
+
+```
+
+## Set Passwords and Apply Password Policies
+```
+root@beenu:~# passwd devuser1                       #set password
+New password:
+Retype new password:
+passwd: password updated successfully
+root@beenu:~# passwd devuser2
+New password:
+Retype new password:
+passwd: password updated successfully
+root@beenu:~# chage -m 2 -M 45 -W 7 devuser1        #change password aging policies
+```
+
+## Sudo Access
+```
+root@beenu:~# usermod -aG sudo devuser1
+```
+
+## Account Expiry and Lock
+```
+root@beenu:~# chage -E 2025-06-28 devuser2                                                   #set account expiry date
+root@beenu:~# cat /etc/passwd | grep devuser
+devuser1:x:1001:1001:Developer one:/home/devuser1:/bin/bash
+devuser2:x:1002:1001::/customhome/devuser2:/bin/bash
+root@beenu:~# chage -l devuser1
+Last password change                                    : Jun 13, 2025
+Password expires                                        : Jul 28, 2025
+Password inactive                                       : never
+Account expires                                         : never
+Minimum number of days between password change          : 2
+Maximum number of days between password change          : 45
+Number of days of warning before password expires       : 7
+root@beenu:~# sudo -l -U devuser1
+Matching Defaults entries for devuser1 on beenu:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin,
+    use_pty
+
+User devuser1 may run the following commands on beenu:
+    (ALL : ALL) ALL
+root@beenu:~# usermod -L devuser2                                                             #lock devuser2 account temporarily
+```
+
+## Verification
+```
+root@beenu:~# groups devuser1
+devuser1 : engineers sudo
+root@beenu:~# groups devuser2
+devuser2 : engineers
+root@beenu:~# sudo -l -U devuser1
+Matching Defaults entries for devuser1 on beenu:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin,
+    use_pty
+
+User devuser1 may run the following commands on beenu:
+    (ALL : ALL) ALL
+root@beenu:~# chage -l devuser1
+Last password change                                    : Jun 13, 2025
+Password expires                                        : Jul 28, 2025
+Password inactive                                       : never
+Account expires                                         : never
+Minimum number of days between password change          : 2
+Maximum number of days between password change          : 45
+Number of days of warning before password expires       : 7
+root@beenu:~# chage -l devuser2
+Last password change                                    : Jun 13, 2025
+Password expires                                        : never
+Password inactive                                       : never
+Account expires                                         : Jun 28, 2025
+Minimum number of days between password change          : 0
+Maximum number of days between password change          : 99999
+Number of days of warning before password expires       : 7
+
+```
+## Cleanup
+```
+root@beenu:~# usermod -U devuser2
+root@beenu:~#
+root@beenu:~# userdel -r devuser1
+userdel: devuser1 mail spool (/var/mail/devuser1) not found
+root@beenu:~# userdel -r devuser2
+userdel: devuser2 mail spool (/var/mail/devuser2) not found
+root@beenu:~# groupdel engineers
+root@beenu:~# groups devuser1
+groups: ‘devuser1’: no such user
+root@beenu:~# cat /etc/passwd | grep devuser
+root@beenu:~#
+```
